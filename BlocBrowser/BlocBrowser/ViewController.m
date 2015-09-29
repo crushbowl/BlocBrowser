@@ -22,7 +22,7 @@
 
 - (void)loadView {
     UIView *mainView = [UIView new];
-
+    
     self.webView = [[WKWebView alloc] init];
     self.webView.navigationDelegate = self;
     
@@ -36,7 +36,7 @@
     self.textField.delegate = self;
     
     
-
+    
     
     [mainView addSubview:self.webView];
     [mainView addSubview:self.textField];
@@ -89,13 +89,13 @@
     
     [self webView:webView didFailNavigation:navigation
         withError:error];
-
+    
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     
     if (error.code != NSURLErrorCancelled) {
-
+        
         UIAlertController *alert = [UIAlertController alertControllerWithTitle: NSLocalizedString(@"Error", @"Error")
                                                                        message:[error localizedDescription]
                                                                 preferredStyle:UIAlertControllerStyleAlert];
@@ -106,8 +106,47 @@
         [alert addAction:okAction];
         
         [self presentViewController:alert animated:YES completion:nil];
-                                
+        
+        
     }
+    
+}
+
+- (void)resetWebView {
+    
+    [self.webView removeFromSuperview];
+    
+    WKWebView *newWebView = [[WKWebView alloc] init];
+    newWebView.navigationDelegate = self;
+    [self.view addSubview:newWebView];
+    
+    
+    self.webView = newWebView;
+    
+    [self addButtonTargets];
+    
+    self.textField.text = nil;
+    [self updateButtonsAndTitle];
+    
+    self.reloadButton.enabled = !self.webView.isLoading && self.webView.URL;
+    
+}
+
+
+- (void) addButtonTargets {
+    for (UIButton *button in @[self.backButton, self.forwardButton, self.stopButton, self.reloadButton]) {
+        [button removeTarget:nil action:NULL forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    [self.backButton setTitle:NSLocalizedString(@"Back", @"Back command") forState:UIControlStateNormal];
+    [self.forwardButton setTitle:NSLocalizedString(@"Forward", @"Forward command") forState:UIControlStateNormal];
+    [self.stopButton setTitle:NSLocalizedString(@"Stop", @"Stop command") forState:UIControlStateNormal];
+    [self.reloadButton setTitle:NSLocalizedString(@"Refresh", @"Reload command") forState:UIControlStateNormal];
+    
+    [self addButtonTargets];
+    
+    
+    
     
 }
 
